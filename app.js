@@ -76,7 +76,7 @@
   let correct = 0;
   let mistakes = 0;
   let blindMode = false;
-  let lastKeyTimer;
+  const keyFlashTimers = new Map();
 
   function loadProgress() {
     try { return { ...DEFAULT_PROGRESS, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") }; }
@@ -212,11 +212,15 @@
   function flashKey(code, kind) {
     const key = document.querySelector(`.key[data-code="${code}"]`);
     if (!key) return;
+    window.clearTimeout(keyFlashTimers.get(code));
     key.classList.remove("key-correct", "key-wrong");
     void key.offsetWidth;
     key.classList.add(kind);
-    window.clearTimeout(lastKeyTimer);
-    lastKeyTimer = window.setTimeout(() => key.classList.remove(kind), 220);
+    const timer = window.setTimeout(() => {
+      key.classList.remove(kind);
+      if (keyFlashTimers.get(code) === timer) keyFlashTimers.delete(code);
+    }, 220);
+    keyFlashTimers.set(code, timer);
   }
 
   function handleKeydown(event) {
