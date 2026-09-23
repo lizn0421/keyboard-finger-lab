@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111928" />
+    <meta name="description" content="十指练习台：从基准键位开始，逐步建立正确键盘指法。" />
+    <title>十指练习台</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1020'/%3E%3Crect x='10' y='17' width='44' height='30' rx='6' fill='none' stroke='%23e9a84c' stroke-width='4'/%3E%3Cpath d='M17 25h5m5 0h5m5 0h5m5 0h-5m-25 8h5m5 0h5m5 0h5m5 0h5m-25 8h24' stroke='%23ffcb77' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">⌨</span>
+          <div>
+            <h1>十指练习台</h1>
+            <p>先准，再快。让手指回到该在的位置。</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="blind-toggle" class="text-button" type="button" aria-pressed="false">盲打模式：关</button>
+          <button id="reset-progress" class="text-button danger" type="button">重置进度</button>
+        </div>
+      </header>
+
+      <section class="notice" aria-label="练习提示">
+        <span class="notice-icon" aria-hidden="true">i</span>
+        <span>请使用英文 QWERTY 键盘并切换到英文输入法。网页会判断按键位置，无法直接识别你实际用了哪根手指。</span>
+      </section>
+
+      <div class="workspace">
+        <aside class="lesson-panel" aria-label="练习课程">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">今日从这里开始</p>
+              <h2>课程</h2>
+            </div>
+            <span id="lesson-count" class="lesson-count">0 / 6</span>
+          </div>
+          <div id="lesson-list" class="lesson-list"></div>
+          <button id="weak-keys-button" class="weak-button" type="button">
+            <span aria-hidden="true">↻</span>
+            <span>按错键复训</span>
+          </button>
+        </aside>
+
+        <section class="training-panel" aria-label="当前练习">
+          <div class="training-head">
+            <div>
+              <p id="lesson-kicker" class="eyebrow">第 1 课 · 建立基准</p>
+              <h2 id="lesson-title">F 和 J 定位</h2>
+              <p id="lesson-description" class="lesson-description">先让左右食指记住基准键。每次按完，手指回到 F / J。</p>
+            </div>
+            <div id="session-state" class="session-state" data-state="ready">准备开始</div>
+          </div>
+
+          <div class="focus-card">
+            <div class="finger-callout">
+              <span class="finger-dot" id="finger-dot" aria-hidden="true"></span>
+              <div>
+                <p class="eyebrow">当前该用</p>
+                <strong id="finger-name">左手食指</strong>
+                <span id="finger-hint">F、G、R、T、V、B</span>
+              </div>
+            </div>
+            <div class="next-key">
+              <span>下一键</span>
+              <strong id="next-key-label">F</strong>
+            </div>
+          </div>
+
+          <div class="target-area" aria-live="polite" aria-label="待输入的练习内容">
+            <p class="target-label">跟着节奏按，不必用力。</p>
+            <div id="target-line" class="target-line"></div>
+            <p id="feedback" class="feedback" data-tone="neutral">点击“开始练习”，然后直接用键盘输入。</p>
+          </div>
+
+          <div class="controls">
+            <button id="start-button" class="primary-button" type="button">开始练习</button>
+            <button id="restart-button" class="secondary-button" type="button">重新开始</button>
+            <button id="next-button" class="secondary-button" type="button">下一课</button>
+          </div>
+
+          <section class="keyboard-section" aria-label="标准键盘指法提示">
+            <div class="keyboard-heading">
+              <div>
+                <p class="eyebrow">标准十指映射</p>
+                <h3>按键会在这里亮起</h3>
+              </div>
+              <span class="keyboard-caption">F / J 凸点是回位锚点</span>
+            </div>
+            <div id="keyboard" class="keyboard" aria-label="虚拟键盘"></div>
+            <div class="finger-legend" aria-label="手指颜色说明">
+              <span><i class="legend-dot lp"></i>左小指</span>
+              <span><i class="legend-dot lr"></i>左无名</span>
+              <span><i class="legend-dot lm"></i>左中指</span>
+              <span><i class="legend-dot li"></i>左食指</span>
+              <span><i class="legend-dot ri"></i>右食指</span>
+              <span><i class="legend-dot rm"></i>右中指</span>
+              <span><i class="legend-dot rr"></i>右无名</span>
+              <span><i class="legend-dot rp"></i>右小指</span>
+            </div>
+          </section>
+        </section>
+
+        <aside class="stats-panel" aria-label="练习数据">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">这一次</p>
+              <h2>节奏</h2>
+            </div>
+          </div>
+          <dl class="live-stats">
+            <div>
+              <dt>正确率</dt>
+              <dd id="accuracy-value">—</dd>
+            </div>
+            <div>
+              <dt>速度</dt>
+              <dd id="speed-value">—</dd>
+            </div>
+            <div>
+              <dt>错误</dt>
+              <dd id="mistakes-value">0</dd>
+            </div>
+            <div>
+              <dt>进度</dt>
+              <dd id="progress-value">0%</dd>
+            </div>
+          </dl>
+
+          <div class="meter" role="progressbar" aria-label="本次练习进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span id="progress-bar"></span>
+          </div>
+
+          <div class="history-card">
+            <p class="eyebrow">累计记录</p>
+            <div class="history-row"><span>完成练习</span><strong id="completed-value">0 次</strong></div>
+            <div class="history-row"><span>最佳速度</span><strong id="best-speed-value">—</strong></div>
+            <div class="history-row"><span>常错按键</span><strong id="weak-keys-value">还没有</strong></div>
+          </div>
+
+          <div class="coaching-note">
+            <span aria-hidden="true">◎</span>
+            <p id="coaching-text">先只盯住正确率。连续两次达到 96%，再追求速度。</p>
+          </div>
+        </aside>
+      </div>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
