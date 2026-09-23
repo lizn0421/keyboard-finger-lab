@@ -214,11 +214,31 @@ h3 { font-size: 1rem; }
 
 .target-area { margin: 25px 0 16px; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: rgba(5, 10, 20, .37); }
 .target-label { color: var(--quiet); font-size: .78rem; }
-.target-line { min-height: 66px; margin: 14px 0 12px; display: flex; flex-wrap: wrap; align-content: center; gap: 5px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: clamp(1.35rem, 2.5vw, 2rem); font-weight: 700; letter-spacing: .04em; }
+.target-line { min-height: 66px; max-height: 185px; overflow: hidden; margin: 14px 0 12px; display: flex; flex-wrap: wrap; align-content: center; gap: 5px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: clamp(1.35rem, 2.5vw, 2rem); font-weight: 700; letter-spacing: .04em; }
 .target-char { min-width: .62em; border-bottom: 2px solid rgba(151,177,217,.17); color: #73849e; line-height: 1.35; text-align: center; }
 .target-char.space { min-width: .8em; }
 .target-char.current { border-bottom-color: var(--accent); color: var(--accent-bright); text-shadow: 0 0 18px rgba(255,203,119,.35); }
 .target-char.correct { border-bottom-color: rgba(81,213,165,.48); color: #9ce5cd; }
+.target-ellipsis { align-self: center; color: var(--quiet); letter-spacing: 0; }
+.ime-practice { margin: 4px 0 13px; }
+.ime-input-label { display: block; margin-bottom: 8px; color: var(--muted); font-size: .76rem; }
+#ime-input {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  outline: none;
+  color: var(--text);
+  background: rgba(7, 14, 27, .72);
+  font: .95rem/1.7 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+#ime-input:focus { border-color: var(--accent-bright); box-shadow: 0 0 0 3px rgba(255,203,119,.12); }
+#ime-input:disabled { cursor: not-allowed; color: var(--quiet); background: rgba(7, 14, 27, .38); }
+.ime-progress { display: flex; justify-content: space-between; gap: 12px; margin-top: 7px; color: var(--quiet); font-size: .73rem; }
+.ime-progress span:last-child { color: var(--accent-bright); white-space: nowrap; }
 .feedback { min-height: 1.3em; color: var(--muted); font-size: .83rem; }
 .feedback[data-tone="error"] { color: #ff9ca6; }
 .feedback[data-tone="success"] { color: #8be7c5; }
@@ -288,8 +308,11 @@ h3 { font-size: 1rem; }
 .key.space-key { grid-column: 40 / span 48; }
 .key.home-key { color: #fff2d6; }
 .key.home-key::before { content: ""; position: absolute; width: 9px; height: 2px; bottom: 9px; border-radius: 3px; background: var(--accent-bright); }
+.key-main { position: relative; z-index: 1; }
+.key-shift-label { position: absolute; top: 3px; left: 4px; color: #8093b0; font-size: .78em; line-height: 1; }
 .key.target { transform: translateY(-2px); border-color: var(--accent-bright); color: #261b0e; background: var(--accent-bright); box-shadow: 0 0 0 3px rgba(255,203,119,.14), 0 0 25px rgba(233,168,76,.35); }
 .key.target::after { background: rgba(38,27,14,.6); }
+.key.target .key-shift-label { color: rgba(38,27,14,.72); }
 .key.key-correct { transform: translateY(1px); border-color: #9ce5cd; color: #113226; background: #9ce5cd; }
 .key.key-wrong { animation: wrong .32s ease; border-color: var(--danger); color: #fff; background: #b7445c; }
 @keyframes wrong { 25% { transform: translateX(-3px); } 55% { transform: translateX(4px); } 100% { transform: translateX(0); } }
@@ -313,6 +336,20 @@ h3 { font-size: 1rem; }
 body.blind-mode .keyboard-section { filter: blur(9px); opacity: .14; pointer-events: none; user-select: none; }
 body.blind-mode .target-char.pending { color: transparent; text-shadow: none; }
 body.blind-mode .target-char.current { color: var(--accent-bright); }
+
+@media (min-width: 761px) {
+  .lesson-panel {
+    position: sticky;
+    top: 16px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 32px);
+  }
+  .lesson-list { min-height: 0; flex: 1 1 auto; overflow-y: auto; padding-right: 4px; }
+  .lesson-list::-webkit-scrollbar { width: 6px; }
+  .lesson-list::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(151,177,217,.26); }
+  .weak-button { flex: 0 0 auto; }
+}
 
 @media (max-width: 1600px) {
   .workspace { grid-template-columns: 205px minmax(0, 1fr); }
