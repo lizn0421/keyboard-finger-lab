@@ -115,13 +115,6 @@
   function getCpm() { if (!startedAt || !correct) return 0; const minutes = Math.max((Date.now() - startedAt) / 60000, 1 / 600); return Math.round(correct / minutes); }
   function getWeakCodes() { return Object.entries(progress.errorCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([code]) => code); }
   function getShiftCode(code) { return (FINGER_BY_CODE[code] || "").startsWith("left") ? "ShiftRight" : "ShiftLeft"; }
-  function getVisibleRange(length) {
-    const windowSize = currentLesson.long ? 118 : length;
-    if (length <= windowSize) return { start: 0, end: length };
-    const start = Math.max(0, Math.min(cursor - 32, length - windowSize));
-    return { start, end: start + windowSize };
-  }
-
   function renderKeyboard() {
     el.keyboard.innerHTML = "";
     KEYBOARD_ROWS.forEach((row) => {
@@ -173,40 +166,45 @@
     else el.coaching.textContent = "很好，继续让每根手指从基准位出发，再回到基准位。";
   }
 
-  function appendEllipsis() {
-    const span = document.createElement("span");
-    span.className = "target-ellipsis";
-    span.textContent = "…";
-    el.target.appendChild(span);
-  }
-
   function renderTarget() {
     el.target.innerHTML = "";
-    const { start, end } = getVisibleRange(sequence.length);
-    if (start > 0) appendEllipsis();
-    sequence.slice(start, end).forEach((item, offset) => {
-      const index = start + offset;
+    sequence.forEach((item, index) => {
       const span = document.createElement("span");
       span.className = `target-char ${item.char === " " ? "space" : ""} ${index < cursor ? "correct" : index === cursor ? "current" : "pending"}`;
       span.textContent = item.char === " " ? "·" : item.char;
       el.target.appendChild(span);
     });
-    if (end < sequence.length) appendEllipsis();
   }
 
   function renderImeTarget() {
     const targetChars = [...currentLesson.text];
-    const { start, end } = getVisibleRange(targetChars.length);
     el.target.innerHTML = "";
-    if (start > 0) appendEllipsis();
-    targetChars.slice(start, end).forEach((char, offset) => {
-      const index = start + offset;
+    targetChars.forEach((char, index) => {
       const span = document.createElement("span");
       span.className = `target-char ${char === " " ? "space" : ""} ${index < cursor ? "correct" : index === cursor ? "current" : "pending"}`;
       span.textContent = char === " " ? "·" : char;
       el.target.appendChild(span);
     });
-    if (end < targetChars.length) appendEllipsis();
+  }
+
+  function followTargetProgress(force = false) {
+    if (!currentLesson.long) return;
+    const focus = el.target.querySelector(".target-char.current") || (cursor ? el.target.lastElementChild : null);
+    if (!focus) {
+      if (force) el.target.scrollTo({ top: 0, behavior: "auto" });
+      return;
+    }
+    const targetBox = el.target.getBoundingClientRect();
+    const focusBox = focus.getBoundingClientRect();
+    const focusTop = focusBox.top - targetBox.top + el.target.scrollTop;
+    const focusBottom = focusTop + focusBox.height;
+    const safeGap = Math.max(18, Math.round(el.target.clientHeight * .2));
+    const viewportTop = el.target.scrollTop;
+    const viewportBottom = viewportTop + el.target.clientHeight;
+    const outOfView = focusTop < viewportTop + safeGap || focusBottom > viewportBottom - safeGap;
+    if (!force && !outOfView) return;
+    const nextTop = Math.max(0, focusTop - (el.target.clientHeight - focusBox.height) / 2);
+    el.target.scrollTo({ top: nextTop, behavior: force ? "auto" : "smooth" });
   }
 
   function setState(label, state) {
@@ -261,7 +259,7 @@
     el.progressBar.parentElement.setAttribute("aria-valuenow", String(pct));
   }
 
-  function renderPractice() {
+  function renderPractice(followTarget = false) {
     if (isImeLesson()) {
       renderImeTarget();
       updateImeFocus();
@@ -271,6 +269,9 @@
       updateFocus();
     }
     updateSessionStats();
+    if (currentLesson.long && (active || followTarget)) {
+      window.requestAnimationFrame(() => followTargetProgress(followTarget));
+    }
   }
 
   function updateLessonModeUi() {
@@ -279,7 +280,11 @@
     el.imePractice.hidden = !ime;
     el.imeInput.disabled = true;
     el.imeInput.value = "";
-    el.targetLabel.textContent = ime ? "切换中文输入法后，在下方输入框逐字输入。文章会跟随进度滑动显示。" : "跟着节奏按，不必用力。";
+    el.targetLabel.textContent = ime
+      ? "切换中文输入法后，在下方输入框逐字输入。全文可滚动阅读，练习时会自动跟随。"
+      : currentLesson.long
+        ? "全文可滚动阅读；开始练习后会自动跟随当前字符。"
+        : "跟着节奏按，不必用力。";
     el.notice.textContent = ime
       ? "中文长文请切换到中文输入法。拼音和双拼方案不同，因此本模式校验最终输入文字，不高亮具体拼音键位。"
       : "英文、数字和符号课程请使用英文 QWERTY 键盘。符号课程会要求正确使用 Shift；网页会判断按键位置，无法直接识别你实际用了哪根手指。";
@@ -297,6 +302,7 @@
     el.start.textContent = "开始练习";
     setState("准备开始", "ready");
     setFeedback(isImeLesson() ? "点击“开始练习”，然后在输入框中输入文章。" : "点击“开始练习”，然后直接用键盘输入。");
+    el.target.scrollTop = 0;
     renderLessons(); renderPractice();
   }
 
@@ -313,7 +319,7 @@
     } else {
       setFeedback("只注意下一键和该用的手指。按错了就慢一点重来。", "neutral");
     }
-    renderPractice();
+    renderPractice(true);
   }
 
   function restartPractice() {
@@ -324,6 +330,7 @@
     el.start.textContent = "开始练习";
     setState("准备开始", "ready");
     setFeedback(isImeLesson() ? "已重置。开始后，在输入框中从第一个字输入。" : "已重置。按开始后，先把 F / J 摸准。");
+    el.target.scrollTop = 0;
     renderPractice();
   }
 
@@ -341,7 +348,7 @@
     el.start.textContent = "再练一次";
     setState("本轮完成", "complete");
     setFeedback(`完成：${accuracy}% 正确率，${speedLabel}。${accuracy >= 96 ? "可以进入下一课。" : "建议再来一遍，先把正确率提到 96%。"}`, "success");
-    renderLessons(); renderHistory(); renderPractice();
+    renderLessons(); renderHistory(); renderPractice(true);
   }
 
   function flashKey(code, kind) {
