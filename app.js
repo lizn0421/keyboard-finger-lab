@@ -204,7 +204,7 @@
     const outOfView = focusTop < viewportTop + safeGap || focusBottom > viewportBottom - safeGap;
     if (!force && !outOfView) return;
     const nextTop = Math.max(0, focusTop - (el.target.clientHeight - focusBox.height) / 2);
-    el.target.scrollTo({ top: nextTop, behavior: force ? "auto" : "smooth" });
+    el.target.scrollTop = nextTop;
   }
 
   function setState(label, state) {
