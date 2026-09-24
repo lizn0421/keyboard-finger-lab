@@ -214,7 +214,7 @@ h3 { font-size: 1rem; }
 
 .target-area { margin: 25px 0 16px; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: rgba(5, 10, 20, .37); }
 .target-label { color: var(--quiet); font-size: .78rem; }
-.target-line { min-height: 66px; max-height: 210px; overflow-x: hidden; overflow-y: auto; margin: 14px 0 12px; padding: 1px 8px 1px 0; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 5px; scroll-behavior: smooth; scrollbar-color: rgba(151,177,217,.58) transparent; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: clamp(1.35rem, 2.5vw, 2rem); font-weight: 700; letter-spacing: .04em; }
+.target-line { min-height: 66px; max-height: 210px; overflow-x: hidden; overflow-y: auto; margin: 14px 0 12px; padding: 1px 8px 1px 0; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 5px; scrollbar-color: rgba(151,177,217,.58) transparent; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: clamp(1.35rem, 2.5vw, 2rem); font-weight: 700; letter-spacing: .04em; }
 .target-char { min-width: .62em; border-bottom: 2px solid rgba(151,177,217,.17); color: #73849e; line-height: 1.35; text-align: center; }
 .target-char.space { min-width: .8em; }
 .target-char.current { border-bottom-color: var(--accent); color: var(--accent-bright); text-shadow: 0 0 18px rgba(255,203,119,.35); }
