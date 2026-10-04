@@ -115,6 +115,35 @@
   function getCpm() { if (!startedAt || !correct) return 0; const minutes = Math.max((Date.now() - startedAt) / 60000, 1 / 600); return Math.round(correct / minutes); }
   function getWeakCodes() { return Object.entries(progress.errorCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([code]) => code); }
   function getShiftCode(code) { return (FINGER_BY_CODE[code] || "").startsWith("left") ? "ShiftRight" : "ShiftLeft"; }
+  function renderHands() {
+    const fingers = [
+      ["pinky", 20, 35, 60, "小指"], ["ring", 47, 15, 80, "无名指"],
+      ["middle", 74, 4, 91, "中指"], ["index", 101, 20, 75, "食指"]
+    ];
+    $("hand-guide").innerHTML = ["left", "right"].map((side) => {
+      const content = fingers.map(([name, x, y, height, label]) => {
+        const id = `${side}-${name}`;
+        return `<g class="hand-finger" data-hand-finger="${id}" style="--hand-color:${FINGER_INFO[id].color}"><title>${side === "left" ? "左手" : "右手"}${label}</title><rect x="${x}" y="${y}" width="21" height="${height}" rx="10.5"/><circle class="hand-tip" cx="${x + 10.5}" cy="${y + 13}" r="5"/></g>`;
+      }).join("");
+      return `<svg viewBox="0 0 180 170" aria-hidden="true"><g ${side === "right" ? 'transform="translate(180 0) scale(-1 1)"' : ""}><path class="hand-palm" d="M20 85 Q20 76 34 78 L111 78 L133 69 Q148 63 151 77 Q154 85 144 96 L127 119 Q121 131 112 139 L111 157 L44 157 L42 135 Q19 119 18 101 Z"/>${content}<g transform="rotate(35 137 96)"><g class="hand-finger" data-hand-finger="${side}-thumb" style="--hand-color:var(--accent)"><title>${side === "left" ? "左手" : "右手"}拇指</title><rect x="126" y="59" width="23" height="57" rx="11.5"/><circle class="hand-tip" cx="137.5" cy="72" r="5"/></g></g><path class="hand-crease" d="M43 108 Q79 96 107 111 M54 140 L99 140"/></g></svg>`;
+    }).join("");
+  }
+
+  function updateHands(item) {
+    const guide = $("hand-guide");
+    guide.querySelectorAll(".hand-finger.active").forEach((node) => node.classList.remove("active"));
+    if (isImeLesson()) {
+      guide.setAttribute("aria-label", "中文输入法模式，不指定拼音键位手指");
+      return;
+    }
+    if (!item) { guide.setAttribute("aria-label", "练习完成，双手回到基准位"); return; }
+    const fingerId = FINGER_BY_CODE[item.code];
+    const ids = fingerId === "thumbs" ? ["left-thumb", "right-thumb"] : [fingerId];
+    if (item.requiresShift) ids.push(getShiftCode(item.code) === "ShiftLeft" ? "left-pinky" : "right-pinky");
+    ids.forEach((id) => guide.querySelector(`[data-hand-finger="${id}"]`)?.classList.add("active"));
+    guide.setAttribute("aria-label", `${FINGER_INFO[fingerId]?.name || "手指"}输入${formatExpected(item)}${item.requiresShift ? "，另一只手小指按住 Shift" : ""}${fingerId === "thumbs" ? "，左右拇指任选一只" : ""}`);
+  }
+
   function renderKeyboard() {
     el.keyboard.innerHTML = "";
     KEYBOARD_ROWS.forEach((row) => {
@@ -217,6 +246,7 @@
   function updateFocus() {
     clearKeyboardTargets();
     const item = sequence[cursor];
+    updateHands(item);
     if (!item) { el.nextKey.textContent = "✓"; return; }
     const finger = FINGER_INFO[FINGER_BY_CODE[item.code]] || FINGER_INFO["left-index"];
     const shiftCode = item.requiresShift ? getShiftCode(item.code) : "";
@@ -233,6 +263,7 @@
 
   function updateImeFocus() {
     clearKeyboardTargets();
+    updateHands(null);
     el.focusLabel.textContent = "当前模式";
     el.fingerName.textContent = "中文输入法";
     el.fingerHint.textContent = "使用拼音或双拼，在输入区逐字校验";
@@ -479,6 +510,7 @@
   });
   document.addEventListener("keydown", handleKeydown);
 
+  renderHands();
   renderKeyboard();
   renderHistory();
   selectLesson(LESSONS[0]);
