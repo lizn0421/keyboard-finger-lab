@@ -449,8 +449,11 @@ body.blind-mode .target-char.current { color: var(--accent-bright); }
   .keyboard-section { margin: 0; padding: 8px 0 0; border-left: 0; border-top: 1px solid var(--line); }
   .keyboard-heading .eyebrow { display: none; }
   .keyboard-heading h3 { font-size: .82rem; }
-  .keyboard { margin-top: 8px; gap: 4px; }
-  .key { min-height: clamp(24px, 4.4dvh, 40px); }
+  .keyboard { --key-size: 40px; width: min(100%, calc(var(--key-size) * 15.75 + 63px)); margin: 8px auto 0; gap: 4px; }
+  .key { min-height: 0; margin-inline-end: 4px; }
+  .key:last-child { margin-inline-end: 0; }
+  .key:not([class*="wide-"]):not(.space-key) { aspect-ratio: 1; }
+  .key.space-key { aspect-ratio: 6.6; }
   .finger-legend { margin-top: 7px; }
   .stats-panel { grid-column: 2; display: flex; flex-direction: column; gap: 12px; padding: 16px; min-height: 0; }
   .stats-panel .panel-heading { display: flex; }
@@ -467,8 +470,7 @@ body.blind-mode .target-char.current { color: var(--accent-bright); }
   .brand p, .lesson-description, .keyboard-heading, .finger-legend { display: none; }
   .focus-card { padding: 6px 10px; }
   .finger-callout #finger-hint { display: none; }
-  .key { min-height: 24px; }
-  .keyboard { margin-top: 0; }
+  .keyboard { --key-size: 24px; margin-top: 0; }
   .stats-panel { padding: 12px; gap: 8px; }
   .coaching-note { display: none; }
 }
