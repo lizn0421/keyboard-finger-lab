@@ -246,7 +246,7 @@
     sequence.forEach((item, index) => {
       const span = document.createElement("span");
       span.className = `target-char ${item.char === " " ? "space" : ""} ${index < cursor ? "correct" : index === cursor ? "current" : "pending"}`;
-      span.textContent = item.char === " " ? "·" : item.char;
+      span.textContent = item.char === " " ? "\u00a0" : item.char;
       el.target.appendChild(span);
     });
   }
@@ -257,7 +257,7 @@
     targetChars.forEach((char, index) => {
       const span = document.createElement("span");
       span.className = `target-char ${char === " " ? "space" : ""} ${index < cursor ? "correct" : index === cursor ? "current" : "pending"}`;
-      span.textContent = char === " " ? "·" : char;
+      span.textContent = char === " " ? "\u00a0" : char;
       el.target.appendChild(span);
     });
   }
