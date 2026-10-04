@@ -45,7 +45,7 @@
   DISPLAY_BY_CODE.ShiftLeft = "左 Shift";
   DISPLAY_BY_CODE.ShiftRight = "右 Shift";
 
-  const LESSONS = [
+  const BASE_LESSONS = [
     { id: "home", step: "第 1 课 · 建立基准", title: "F 和 J 定位", subtitle: "左右食指", description: "先让左右食指记住基准键。每次按完，手指回到 F / J。", text: "f j f j f j d k f j d k" },
     { id: "home-row", step: "第 2 课 · 横向移动", title: "主键区", subtitle: "ASDF · JKL;", description: "保持手腕悬空或轻放，不要整只手横着挪。", text: "a s d f j k l ; a s d f j k l ;" },
     { id: "left-hand", step: "第 3 课 · 左手路线", title: "左手四指", subtitle: "QWER · ASDF · ZXCV", description: "每个键都从基准位伸出去，再自然回位。", text: "q w e r a s d f z x c v f d s a" },
@@ -60,6 +60,52 @@
     { id: "english-article", step: "第 12 课 · 长文挑战", title: "英文长文挑战", subtitle: "约 300 键", long: true, description: "不用追求一口气打完，先用稳定的速度保持正确率。", text: "steady typing begins with relaxed shoulders and quiet hands. keep every finger close to its home key, look at the screen, and let accuracy lead speed. when a mistake appears, slow down for one breath, correct the next movement, and return to the rhythm. a long passage is not a sprint. it is a series of small, reliable decisions that gradually become automatic." },
     { id: "chinese-article", step: "第 13 课 · 长文挑战", title: "中文长文挑战", subtitle: "输入法 · 原创文章", mode: "ime", long: true, description: "使用你习惯的拼音或双拼输入法，逐字完成一段原创文章。", text: "在安静的清晨，先把双手轻放在键盘的基准位置。不要急着追求速度，先让每一次敲击都准确而均匀。屏幕上的文字像一条缓慢延伸的道路，眼睛看着前方，手指负责完成熟悉的动作。当一个词输入错误时，停下来确认，再继续向前。长期练习并不依赖一次很长的冲刺，而是依赖每天十分钟稳定的重复。真正可靠的速度，来自放松的肩膀、清楚的节奏和对错误的耐心修正。" }
   ];
+
+  // Each stage introduces a new movement. Rotate phrase order between rounds
+  // so practice reinforces the same fingers without looping one fixed string.
+  const STAGE_PATTERNS = {
+    home: [ ["ff jj", "fj jf", "f j f j", "jf fj"], ["fd jk", "df kj", "fj dk", "df jk"], ["fjdk kjdf", "ffj ddkk", "dfjk fjkd", "jfk dkj fjd"] ],
+    "home-row": [ ["asdf jkl;", "fdsa ;lkj", "aa ss dd ff", "jj kk ll ;;"], ["aj sk dl f;", "as jk df l;", "fj dk sl a;", "fads j;kl"], ["sad flask", "ask dad", "all falls;", "a lad asks;", "jkl; asdf"] ],
+    "left-hand": [ ["qa ws ed rf", "az sx dc fv", "qaz wsx edc", "rfv fvr"], ["qwer asdf", "zxcv fdsa", "qaz fdc wsx", "qf wa es rd"], ["red wax", "far sad", "a few faces", "were aware", "we race fast"] ],
+    "right-hand": [ ["yj uh ij ok", "pl jm hn", "yhn ujm ik", "olp lpo"], ["yuio hjkl", "nm jk ui", "yujh ikol", "poli mn ju"], ["you join", "my opinion", "only him", "milk moon", "look up"] ],
+    reach: [ ["fr ft gv gb", "jy ju hn hm", "rf vf tg bg", "yj nj uh mh"], ["rtfg vbgt", "yuhj nmju", "fvjt gbhn", "truy vmnb"], ["try turn", "run rhythm", "very hungry", "tiny trumpet", "bring my bag"] ],
+    phrase: [ ["fast hands", "find home", "slow and steady", "rest then type"], ["keep your hands relaxed", "return to the home row", "look ahead and type calmly", "accuracy comes before speed"], ["small changes make a steady rhythm", "each finger follows its own path", "read the next word before you move", "practice patiently and keep going"] ],
+    numbers: [ ["1122 3344", "5566 7788", "9900 0011", "12345 67890"], ["13579 24680", "10203 40506", "90807 60504", "121 343 565 787"], ["19028 37465", "60291 85347", "314159 265358", "20261004 08301945"] ],
+    "number-rhythm": [ ["12 34 56 78", "2026-10-04", "08:30 19:45", "3.14 0.25"], ["192.168.1.1", "10.0.0.254", "2026-12-23 21:05", "128.50 1024.75"], ["order-2048: 39.95", "2027-01-06 07:35:20", "v3.14.159 100.00%", "192.168.10.128:8080"] ],
+    "symbols-basic": [ ["[] []", ";; ''", ",. /-", "== \\ \\"], ["[a] [s] [d]", "a=b; c=d;", "one/two", "a,b.c-d"], ["[name='sam'];", "path=a/b/c;", "list=[1,2,3];", "x=0.25; y=-1;", "c:\\data\\logs"] ],
+    "symbols-shift": [ ["!! @@ ##", "$$ %% ^^", "&& ** ()", "__ ++ {}"], ["!@ #$ %^", "&* () _+", "{} |: \"?", "<> ?: +_"], ["{a+b} != 0", "\"yes?\" 100%", "<x> & <y>", "#tag @user!", "a:b | c:d"] ],
+    mixed: [ ["v2.6.1", "@keyboard", "#build_2026", "100% ready!"], ["user_01@mail.com", "score=98.5%;", "[id:2048]", "time=08:30:15"], ["if (x>0) {y=x+1;}", "total=$129.95; tax=6%;", "https://example.com/v3?id=42", "\"release_2026\" #ready!"] ]
+  };
+  const STAGE_NAMES = ["建立节奏", "交替组合", "连续挑战"];
+  function expandPatterns(patterns, stage) {
+    return Array.from({ length: stage + 3 }, (_, round) => {
+      const ordered = patterns.map((_, index) => patterns[(index + round) % patterns.length]);
+      return (round % 2 ? ordered.reverse() : ordered).join(" ");
+    }).join(" ");
+  }
+  const LESSONS = BASE_LESSONS.map((lesson) => {
+    let stages;
+    if (STAGE_PATTERNS[lesson.id]) {
+      stages = STAGE_PATTERNS[lesson.id].map(expandPatterns);
+    } else if (lesson.mode === "ime") {
+      stages = [lesson.text,
+        "午后的阳光落在书桌上，窗外传来很轻的脚步声。我打开一份旧笔记，试着把零散的想法整理成完整的句子。开始时，每个字都需要仔细确认；慢慢地，手指找到了自己的节奏，眼睛也能提前看向下一个词。练习中最容易忽略的，并不是某个复杂的词语，而是简单动作之间的衔接。遇到不熟悉的标点，先看清它的位置，再从容输入。短暂的停顿并不会破坏进步，仓促的动作反而容易让错误连续发生。",
+        "今天的任务是整理一次出行计划：早上八点半出发，先到公园散步，再去图书馆归还两本书。出门前，需要检查钥匙、雨伞和相机；回家后，还要记录当天的花费与见闻。这些看似普通的事情，写成文章以后，就包含了不同长度的词语、数字和标点。有人问：“练习多久才能变快？”我更愿意观察另一个变化——当注意力放在内容上时，双手是否仍然能够准确完成动作。完成最后一句话后，放松肩膀，回顾刚才最容易出错的地方，下一次再有针对性地练习。"];
+    } else {
+      stages = [lesson.text,
+        "on a quiet afternoon, a traveler opened an old notebook beside the window. the first page held a simple plan: walk through the park, visit the library, and write about one small discovery. as the sentences grew longer, the hands had to connect familiar movements in unfamiliar orders. pause at the end of a thought, breathe easily, and begin the next line with the same calm attention. a comfortable rhythm can change without falling apart. the goal is to read ahead while each finger returns to a reliable starting point.",
+        "the next task adds details: meet at 08:30, bring 2 notebooks, and record the total cost of $24.50. check the address twice; then send a short message to alex@example.com. is every item ready? use a checklist [keys, water, camera] and mark each step when it is done! words, numbers, and symbols now share the same passage, so the movement changes more often. accuracy should stay steady through these transitions. when the last line is complete, relax your hands and notice which combinations deserve a little more practice tomorrow."];
+    }
+    const separator = lesson.mode === "ime" ? "" : " ";
+    const text = stages.join(separator);
+    let offset = 0;
+    const stageEnds = stages.map((stage, index) => {
+      offset += [...stage].length + (index < stages.length - 1 ? separator.length : 0);
+      return offset;
+    });
+    return { ...lesson, text, long: true, stageEnds,
+      subtitle: `3 阶段 · ${[...text].length} ${lesson.mode === "ime" ? "字" : "键"}` };
+  });
 
   const KEYBOARD_ROWS = [
     [ ["Backquote", "`", "", "~"], ["Digit1", "1", "", "!"], ["Digit2", "2", "", "@"], ["Digit3", "3", "", "#"], ["Digit4", "4", "", "$"], ["Digit5", "5", "", "%"], ["Digit6", "6", "", "^"], ["Digit7", "7", "", "&"], ["Digit8", "8", "", "*"], ["Digit9", "9", "", "("], ["Digit0", "0", "", ")"], ["Minus", "-", "", "_"], ["Equal", "=", "", "+"], ["Backspace", "⌫", "wide-2"] ],
@@ -291,6 +337,11 @@
   }
 
   function renderPractice(followTarget = false) {
+    if (currentLesson.stageEnds) {
+      const stage = Math.min(2, currentLesson.stageEnds.findIndex((end) => cursor < end) === -1
+        ? 2 : currentLesson.stageEnds.findIndex((end) => cursor < end));
+      el.lessonKicker.textContent = `${currentLesson.step} · ${stage + 1}/3 ${STAGE_NAMES[stage]}`;
+    }
     if (isImeLesson()) {
       renderImeTarget();
       updateImeFocus();
