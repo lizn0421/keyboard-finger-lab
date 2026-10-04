@@ -291,6 +291,7 @@
   }
 
   function selectLesson(lesson) {
+    $("lesson-dialog").close();
     currentLesson = lesson;
     sequence = isImeLesson() ? [...lesson.text] : sequenceFromText(lesson.text);
     cursor = 0; active = false; startedAt = 0; correct = 0; mistakes = 0;
@@ -366,6 +367,7 @@
   }
 
   function handleKeydown(event) {
+    if ($("lesson-dialog").open) return;
     if (isImeLesson() || !active || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
     const expected = sequence[cursor];
     if (!expected) return;
@@ -457,6 +459,8 @@
   }
 
   el.start.addEventListener("click", startPractice);
+  $("choose-lesson").addEventListener("click", () => $("lesson-dialog").showModal());
+  $("close-lessons").addEventListener("click", () => $("lesson-dialog").close());
   el.restart.addEventListener("click", restartPractice);
   el.next.addEventListener("click", nextLesson);
   el.weakButton.addEventListener("click", startWeakKeyPractice);
