@@ -117,15 +117,15 @@
   function getShiftCode(code) { return (FINGER_BY_CODE[code] || "").startsWith("left") ? "ShiftRight" : "ShiftLeft"; }
   function renderHands() {
     const fingers = [
-      ["pinky", 20, 35, 60, "小指"], ["ring", 47, 15, 80, "无名指"],
-      ["middle", 74, 4, 91, "中指"], ["index", 101, 20, 75, "食指"]
+      ["pinky", 20, 35, 60, "小指", -20], ["ring", 47, 15, 80, "无名指", -8],
+      ["middle", 74, 4, 91, "中指", 3], ["index", 101, 20, 75, "食指", 17]
     ];
     $("hand-guide").innerHTML = ["left", "right"].map((side) => {
-      const content = fingers.map(([name, x, y, height, label]) => {
+      const content = fingers.map(([name, x, y, height, label, angle]) => {
         const id = `${side}-${name}`;
-        return `<g class="hand-finger" data-hand-finger="${id}" style="--hand-color:${FINGER_INFO[id].color}"><title>${side === "left" ? "左手" : "右手"}${label}</title><rect x="${x}" y="${y}" width="21" height="${height}" rx="10.5"/><circle class="hand-tip" cx="${x + 10.5}" cy="${y + 13}" r="5"/></g>`;
+        return `<g transform="rotate(${angle} ${x + 10.5} ${y + height})"><g class="hand-finger" data-hand-finger="${id}" style="--hand-color:${FINGER_INFO[id].color}"><title>${side === "left" ? "左手" : "右手"}${label}</title><rect x="${x}" y="${y}" width="21" height="${height}" rx="10.5"/><circle class="hand-tip" cx="${x + 10.5}" cy="${y + 13}" r="5"/></g></g>`;
       }).join("");
-      return `<svg viewBox="0 0 180 170" aria-hidden="true"><g ${side === "right" ? 'transform="translate(180 0) scale(-1 1)"' : ""}><path class="hand-palm" d="M20 85 Q20 76 34 78 L111 78 L133 69 Q148 63 151 77 Q154 85 144 96 L127 119 Q121 131 112 139 L111 157 L44 157 L42 135 Q19 119 18 101 Z"/>${content}<g transform="rotate(35 137 96)"><g class="hand-finger" data-hand-finger="${side}-thumb" style="--hand-color:var(--accent)"><title>${side === "left" ? "左手" : "右手"}拇指</title><rect x="126" y="59" width="23" height="57" rx="11.5"/><circle class="hand-tip" cx="137.5" cy="72" r="5"/></g></g><path class="hand-crease" d="M43 108 Q79 96 107 111 M54 140 L99 140"/></g></svg>`;
+      return `<svg viewBox="-15 0 210 170" aria-hidden="true"><g ${side === "right" ? 'transform="translate(180 0) scale(-1 1)"' : ""}><path class="hand-palm" d="M20 85 Q20 76 34 78 L111 78 L133 69 Q148 63 151 77 Q154 85 144 96 L127 119 Q121 131 112 139 L111 157 L44 157 L42 135 Q19 119 18 101 Z"/>${content}<g transform="rotate(55 137 96)"><g class="hand-finger" data-hand-finger="${side}-thumb" style="--hand-color:var(--accent)"><title>${side === "left" ? "左手" : "右手"}拇指</title><rect x="126" y="59" width="23" height="57" rx="11.5"/><circle class="hand-tip" cx="137.5" cy="72" r="5"/></g></g><path class="hand-crease" d="M43 108 Q79 96 107 111 M54 140 L99 140"/></g></svg>`;
     }).join("");
   }
 
