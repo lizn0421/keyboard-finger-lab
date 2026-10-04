@@ -427,15 +427,18 @@ body.blind-mode .target-char.current { color: var(--accent-bright); }
 .lesson-panel .panel-heading, .lesson-panel .weak-button { flex-shrink: 0; }
 @media (min-width: 761px) {
   body { height: 100dvh; overflow: hidden; }
-  .app-shell { height: 100dvh; width: min(1540px, calc(100% - 32px)); padding: 14px 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 10px; }
+  .app-shell { height: 100dvh; width: min(1380px, calc(100% - 40px)); padding: 18px 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 12px; }
   .brand-mark { width: 40px; height: 40px; }
   .notice { margin: 0; padding: 6px 10px; font-size: .74rem; }
-  .workspace { min-height: 0; grid-template-columns: minmax(0, 1fr) 210px; gap: 14px; align-items: stretch; }
-  .training-panel { min-height: 0; padding: 16px 20px; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: 10px; }
+  .workspace { min-height: 0; grid-template-columns: minmax(0, 1fr) 200px; gap: 16px; align-items: stretch; }
+  .training-panel { min-height: 0; padding: 18px 22px; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: 12px; }
   .training-head, .focus-card, .target-area, .controls, .keyboard-section { grid-column: 1; grid-row: auto; }
   .training-head { gap: 12px; }
   .lesson-description { font-size: .78rem; }
-  .focus-card { margin: 0; padding: 10px 14px; }
+  .focus-card { margin: 0; padding: 9px 14px; background: rgba(34, 57, 92, .42); }
+  .finger-callout > div { display: grid; grid-template-columns: auto auto; align-items: center; gap: 3px 10px; }
+  .finger-callout strong { margin: 0; font-size: .93rem; }
+  .finger-callout #finger-hint { grid-column: 1 / -1; }
   .target-area { min-height: 0; margin: 0; padding: 10px 14px; display: flex; flex-direction: column; overflow: hidden; }
   .target-label { flex-shrink: 0; }
   .target-line { min-height: 0; max-height: none; flex: 1 1 0; margin: 8px 0; font-size: clamp(1.15rem, 2vw, 1.65rem); gap: 3px; }
@@ -444,22 +447,29 @@ body.blind-mode .target-char.current { color: var(--accent-bright); }
   #ime-input { height: 64px; min-height: 0; resize: none; padding: 6px 10px; }
   .ime-input-label { margin-bottom: 3px; }
   .ime-progress { margin-top: 2px; }
+  .ime-mode .target-area { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px 16px; }
+  .ime-mode .target-label, .ime-mode .feedback { grid-column: 1 / -1; }
+  .ime-mode .target-line { grid-column: 1; grid-row: 2; margin: 0; }
+  .ime-mode .ime-practice { grid-column: 2; grid-row: 2; min-height: 0; display: flex; flex-direction: column; margin: 0; }
+  .ime-mode #ime-input { flex: 1; height: 0; min-height: 48px; }
+  .ime-mode .ime-progress { font-size: .68rem; }
   .controls { gap: 8px; }
   .controls button { padding: 8px 13px; }
-  .keyboard-section { margin: 0; padding: 8px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+  .keyboard-section { margin: 0; padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--line); }
   .keyboard-heading .eyebrow { display: none; }
   .keyboard-heading h3 { font-size: .82rem; }
-  .keyboard { --key-size: 40px; width: min(100%, calc(var(--key-size) * 15.75 + 63px)); margin: 8px auto 0; gap: 4px; }
-  .key { min-height: 0; margin-inline-end: 4px; }
+  .keyboard { --key-size: clamp(36px, 6dvh, 60px); width: min(100%, calc(var(--key-size) * 15.75 + 63px)); margin: 12px auto 0; gap: 5px; }
+  .key { min-height: 0; margin-inline-end: 4px; border-radius: 8px; font-size: clamp(.68rem, .95vw, .86rem); }
   .key:last-child { margin-inline-end: 0; }
   .key:not([class*="wide-"]):not(.space-key) { aspect-ratio: 1; }
   .key.space-key { aspect-ratio: 6.6; }
-  .finger-legend { margin-top: 7px; }
-  .stats-panel { grid-column: 2; display: flex; flex-direction: column; gap: 12px; padding: 16px; min-height: 0; }
+  .finger-legend { margin-top: 10px; justify-content: center; }
+  .stats-panel { grid-column: 2; display: flex; flex-direction: column; gap: 16px; padding: 16px; min-height: 0; align-self: start; }
   .stats-panel .panel-heading { display: flex; }
   .stats-panel .meter { display: block; flex-shrink: 0; }
   .live-stats { margin: 0; gap: 6px; }
-  .live-stats div { min-height: 58px; padding: 9px; }
+  .live-stats div { min-height: 68px; padding: 11px; }
+  .live-stats dd { font-size: 1.15rem; }
   .history-card { margin: 0; padding-top: 12px; border-top: 1px solid var(--line); }
   .history-row { padding: 6px 0; }
   .coaching-note { margin: 0; padding: 8px; }
@@ -470,7 +480,7 @@ body.blind-mode .target-char.current { color: var(--accent-bright); }
   .brand p, .lesson-description, .keyboard-heading, .finger-legend { display: none; }
   .focus-card { padding: 6px 10px; }
   .finger-callout #finger-hint { display: none; }
-  .keyboard { --key-size: 24px; margin-top: 0; }
+  .keyboard { --key-size: clamp(30px, 5.5dvh, 46px); margin-top: 0; }
   .stats-panel { padding: 12px; gap: 8px; }
   .coaching-note { display: none; }
 }
