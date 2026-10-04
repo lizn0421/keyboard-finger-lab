@@ -430,7 +430,7 @@ body.blind-mode .target-char.current { color: var(--accent-bright); }
   .app-shell { height: 100dvh; width: min(1540px, calc(100% - 32px)); padding: 14px 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 10px; }
   .brand-mark { width: 40px; height: 40px; }
   .notice { margin: 0; padding: 6px 10px; font-size: .74rem; }
-  .workspace { min-height: 0; grid-template-columns: minmax(0, 1fr) 210px; gap: 14px; }
+  .workspace { min-height: 0; grid-template-columns: minmax(0, 1fr) 210px; gap: 14px; align-items: stretch; }
   .training-panel { min-height: 0; padding: 16px 20px; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: 10px; }
   .training-head, .focus-card, .target-area, .controls, .keyboard-section { grid-column: 1; grid-row: auto; }
   .training-head { gap: 12px; }
